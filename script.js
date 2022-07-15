@@ -107,14 +107,34 @@ c('.pizzaInfo--addButton').addEventListener('click', ()=>{
     updateCart();
     closeModal();
 } );
+//Mobile
+    c('.menu-openner span').addEventListener('click', () => {
+        if(cart.length > 0){
+            c('aside').style.left = "0";
+        }
+    });
+
+c('.menu-closer').addEventListener('click', () =>{
+        c('aside').style.left = "100vw";
+    });
 
 function updateCart(){
+
+    c('.menu-openner span').innerHTML = cart.length;
+
     if(cart.length > 0){
         c('aside').classList.add('show');
         c('.cart').innerHTML= '';
 
+        let subtotal = 0;
+        let desconto = 0;
+        let total = 0;
+
         for (let i in cart) {
             let pizzaItem = pizzaJson.find((item)=>item.id == cart[i].id);
+
+            subtotal += pizzaItem.price * cart[i].qt;
+
             let carItem = c('.models .cart--item').cloneNode(true);
 
             let pizzaSizeName;
@@ -134,11 +154,31 @@ function updateCart(){
             carItem.querySelector('img').src = pizzaItem.img;
             carItem.querySelector('.cart--item-nome').innerHTML = pizzaName;
             carItem.querySelector('.cart--item--qt').innerHTML = cart[i].qt;
+            carItem.querySelector('.cart--item-qtmenos').addEventListener('click', ()=>{
+                if (cart[i].qt > 1){
+                    cart[i].qt--;
+                }else{
+                    cart.splice(i, 1);
+                }
+                updateCart();
+            });
+            carItem.querySelector('.cart--item-qtmais').addEventListener('click', () => {
+                cart[i].qt++;
+                updateCart();
+            });
 
             c('.cart').append(carItem);
         }
 
+        desconto = subtotal * 0.1;
+        total = subtotal - desconto;
+
+        c('.subtotal span:last-child').innerHTML = `R$ ${subtotal.toFixed(2)}`;
+        c('.desconto span:last-child').innerHTML = `R$ ${desconto.toFixed(2)}`;
+        c('.total span:last-child').innerHTML = `R$ ${total.toFixed(2)}`;
+
     }else{
         c('aside').classList.remove('show');
+        c('aside').style.left = "100vw";
     }
 }
